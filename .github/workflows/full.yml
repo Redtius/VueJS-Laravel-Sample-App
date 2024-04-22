@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master # Workflow only executes on the master branch
-    workflow_dispatch: # allows me to run it manually
+    # workflow_dispatch: # allows me to run it manually
 
 jobs:
   deploy_client:
@@ -17,7 +17,7 @@ jobs:
     - name: Build
       shell: bash
       working-directory: ./client
-      runs: npm run build # Build the Vue.JS App
+      run: npm run build # Build the Vue.JS App
               
     - name: S3 Sync            
       uses: jakejarvis/s3-sync-action@v0.5.1
