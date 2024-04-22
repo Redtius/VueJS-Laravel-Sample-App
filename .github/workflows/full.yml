@@ -13,11 +13,24 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v2 # checkout the repository code into the runner
+
+    - name: Setup Node
+      uses: actions/setup-node@v1
+      with:
+        node-version: '20'
+    - name: Setup Cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: ${{ runner.os }}-node-
     
     - name: Build
       shell: bash
       working-directory: ./client
-      run: npm run build # Build the Vue.JS App
+      run: |
+        npm install
+        npm run build --if-present # Build the Vue.JS App
               
     - name: S3 Sync            
       uses: jakejarvis/s3-sync-action@v0.5.1
