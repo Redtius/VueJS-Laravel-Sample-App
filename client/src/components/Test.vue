@@ -27,7 +27,7 @@ export default {
   methods: {
     addWord() {
       // Send POST request to backend to add new word
-      fetch('http://127.0.0.1:8000/words', {
+      fetch('http://127.0.0.1:8000/api/words', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -46,7 +46,7 @@ export default {
     },
     fetchWords() {
       // Send GET request to fetch words from backend
-      fetch('http://127.0.0.1:8000/words')
+      fetch('http://127.0.0.1:8000/api/words')
       .then(response => response.json())
       .then(data => {
         this.words = data;
