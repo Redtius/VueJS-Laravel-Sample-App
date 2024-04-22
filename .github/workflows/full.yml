@@ -1,0 +1,31 @@
+name: Full Workflow
+
+on:
+  push:
+    branches:
+      - master # Workflow only executes on the master branch
+    workflow_dispatch: # allows me to run it manually
+
+jobs:
+  deploy_client:
+    runs-on: ubuntu-latest # choosing the underlying OS (runner)
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2 # checkout the repository code into the runner
+    
+    - name: Build
+      shell: bash
+      working-directory: ./client
+      runs: npm run build # Build the Vue.JS App
+              
+    - name: S3 Sync            
+      uses: jakejarvis/s3-sync-action@v0.5.1
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
+        AWS_S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        AWS_REGION: us-east-1
+        SOURCE_DIR: ./client/dist
+        ARGS: "--acl public-read"
+
