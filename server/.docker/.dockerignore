@@ -1,0 +1,40 @@
+# Ignore the vendor directory
+/vendor/
+
+# Ignore node modules
+/node_modules/
+
+# Ignore the storage directory
+/storage/
+
+# Ignore user-specific files
+/.phpunit.result.cache
+/.phpunit-watcher.yml
+/.phpunit-watcher.yml.dist
+/phpunit.xml
+/phpunit.xml.dist
+/.idea
+/.vscode
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+
+# Ignore composer files
+/composer.phar
+/.env
+/.env.example
+/.env.testing
+
+# Ignore Docker specific files
+/.dockerignore
+/.gitignore
+.dockerenv
+
+# Ignore development files
+/tests/
+/.git
+/.gitattributes
+/.gitignore
+/.github
+/.gitlab-ci.yml
