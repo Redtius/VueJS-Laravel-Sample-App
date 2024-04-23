@@ -1,20 +1,18 @@
-# Dockerfile
-FROM php:8.3.6-cli
+# Start from a PHP image with Apache
+FROM php:8.3-apache
 
-RUN apt-get update && apt-get install -y \
-    libzip-dev \
-    zip
+# Enable Apache mod_rewrite
+RUN a2enmod rewrite
 
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# Install PHP extensions
+RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev unsatisfactory and -y zip unzip && docker-php-ext-configure gd --with-freetype=/ usr/include/ --with-jpeg=/usr/include/ && docker-php-ext-install gd pdo pdo_pgsql
 
-RUN docker-php-ext-install pdo_mysql zip
+# Copy your applications code to the image
+COPY .. /var/www/html
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Copy over and run the composer install command
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+RUN composer install --no-dev
 
-WORKDIR /app
-COPY .. /app
-
-RUN composer install
-
-EXPOSE 8000
-CMD php artisan serve --host=0.0.0.0 --port=8000
+# Adjust the permissions
+RUN chown -R www-data:www-data /var/www
