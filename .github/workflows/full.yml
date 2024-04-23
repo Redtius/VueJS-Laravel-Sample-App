@@ -44,8 +44,8 @@ jobs:
   deploy_server:
     runs-on: ubuntu-latest
     defaults:
-    run:
-      working-directory: ./server
+      run:
+        working-directory: ./server
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
