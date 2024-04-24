@@ -29,10 +29,7 @@ WORKDIR /var/www/html
 
 # Copy over and run the composer install command
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN composer install --no-dev
-
-# Generate application key
-RUN php artisan key:generate
+RUN composer install
 
 # Adjust permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
