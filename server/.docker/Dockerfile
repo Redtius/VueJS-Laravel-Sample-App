@@ -5,7 +5,9 @@ FROM php:8.3-apache
 RUN a2enmod rewrite
 
 # Install PHP extensions
-RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev unsatisfactory and -y zip unzip && docker-php-ext-configure gd --with-freetype=/ usr/include/ --with-jpeg=/usr/include/ && docker-php-ext-install gd pdo pdo_pgsql
+RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev zip unzip \
+    && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
+    && docker-php-ext-install gd pdo pdo_pgsql
 
 # Copy your applications code to the image
 COPY .. /var/www/html
