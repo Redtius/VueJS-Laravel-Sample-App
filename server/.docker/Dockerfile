@@ -4,17 +4,28 @@ FROM php:8.3-apache
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
-# Install PHP extensions
-RUN apt-get update && apt-get install -y libpng-dev libjpeg-dev libfreetype6-dev zip unzip \
-    && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
+# Install PHP extensions and other dependencies
+RUN apt-get update -y && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    zlib1g-dev \
+    libpq-dev \
+    zip \
+    unzip
+
+# Configure and install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd pdo pdo_pgsql
 
-# Copy your applications code to the image
-COPY .. /var/www/html
+# Copy your application's code to the image
+COPY . /var/www/html
 
-# Copy over and run the composer install command
-COPY --from=composer /usr/bin/composer /usr/bin/composer
-RUN composer install --no-dev
+# Adjust permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 /var/www/html/storage
 
-# Adjust the permissions
-RUN chown -R www-data:www-data /var/www
+# Expose port 80 and start Apache
+EXPOSE 80
+CMD ["apache2-foreground"]
+
