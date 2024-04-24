@@ -4,9 +4,6 @@ FROM php:8.3-apache
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
-# Set the working directory
-WORKDIR /app
-
 # Install PHP extensions
 RUN apt-get update -y && apt-get install -y \
     libpng-dev \
