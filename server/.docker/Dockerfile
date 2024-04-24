@@ -23,7 +23,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 COPY .. /var/www/html
 
 # Copy over and run the composer install command
-# COPY --from=composer /usr/bin/composer /usr/bin/composer
+COPY --from=composer /usr/bin/composer /usr/bin/composer
 RUN composer install --no-dev
 
 # Adjust the permissions
