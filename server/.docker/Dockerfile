@@ -16,9 +16,12 @@ RUN apt-get update -y && apt-get install -y \
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd pdo pdo_pgsql
 
+# Configure Apache
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+RUN sed -i 's/DirectoryIndex index.html index.cgi index.pl index.php/DirectoryIndex index.php index.html index.cgi index.pl/g' /etc/apache2/mods-enabled/dir.conf
+
 
 # Copy your applications code to the image
 COPY .. /var/www/html
@@ -27,6 +30,9 @@ WORKDIR /var/www/html
 # Copy over and run the composer install command
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN composer install --no-dev
+
+# Generate application key
+RUN php artisan key:generate
 
 # Adjust permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
