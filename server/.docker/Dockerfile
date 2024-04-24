@@ -23,6 +23,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 COPY .. /var/www/html
 
 # Copy over and run the composer install command
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 RUN composer install --no-dev
 
