@@ -1,40 +1,43 @@
-# Start from a PHP image with Apache
-FROM php:8.3-apache
+FROM php:apache
 
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
-
-# Install PHP extensions
-RUN apt-get update -y && apt-get install -y \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev\
-    zlib1g-dev \
-    libpq-dev \
-    zip unzip
-# Configure and install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_pgsql
-
-# Configure Apache
-RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-RUN sed -i 's/DirectoryIndex index.html index.cgi index.pl index.php/DirectoryIndex index.php index.html index.cgi index.pl/g' /etc/apache2/mods-enabled/dir.conf
-
-
-# Copy your applications code to the image
-COPY .. /var/www/html
-WORKDIR /var/www/html
-
-# Copy over and run the composer install command
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN composer install
-
-# Adjust permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Expose port 80 and start Apache
 EXPOSE 80
-CMD ["apache2-foreground"]
+
+# apt-get
+RUN apt-get update && \
+    apt-get -y install \
+        curl \
+        zip \
+        unzip \
+        libzip-dev \
+        libpq-dev \
+        postgresql-client
+
+# docker-php ext-install:
+RUN docker-php-ext-install zip \
+    pdo_pgsql
+
+# composer:
+COPY .docker/composer-install.sh /tmp
+RUN /tmp/composer-install.sh && mv composer.phar /usr/local/bin/composer
+
+# DIR
+WORKDIR /server
+COPY . ./
+
+# apache:
+COPY .docker/vhost.conf /etc/apache2/sites-available/000-default.conf
+
+# composer configuration:
+COPY ./composer.json ./composer.json
+COPY ./composer.lock ./composer.lock
+
+RUN composer install --no-interaction --no-scripts
+
+# entrypoint
+COPY .docker/Entrypoint.sh /usr/local/bin/
+
+# www-data:
+RUN chown -R www-data:www-data ./ && a2enmod rewrite
+RUN chown -R www-data:www-data ./storage
+
+RUN chmod 755 /usr/local/bin/Entrypoint.sh
