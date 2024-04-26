@@ -18,6 +18,7 @@ RUN docker-php-ext-install zip \
 
 # composer:
 COPY .docker/composer-install.sh /tmp
+RUN RUN chmod 755 /tmp/composer-install.sh
 RUN /tmp/composer-install.sh && mv composer.phar /usr/local/bin/composer
 
 # DIR
