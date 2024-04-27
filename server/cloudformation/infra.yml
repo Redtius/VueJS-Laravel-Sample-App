@@ -311,8 +311,7 @@ Resources:
       TaskRoleArn: !Ref TaskRole
       ContainerDefinitions:
         - Name: !Ref ServiceName
-          Image:
-            "redtius/laravel-example:${ImageTag}",
+          Image: "redtius/laravel-example:${ImageTag}"
           Command: ["/usr/local/bin/Entrypoint.sh"]
           Essential: True
           PortMappings:
