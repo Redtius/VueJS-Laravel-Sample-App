@@ -312,15 +312,7 @@ Resources:
       ContainerDefinitions:
         - Name: !Ref ServiceName
           Image:
-            !Join [
-              ".",
-              [
-                !Ref AWS::AccountId,
-                "dkr.ecr",
-                !Ref AWS::Region,
-                !Sub "redtius/laravel-example:${ImageTag}",
-              ],
-            ]
+            "redtius/laravel-example:${ImageTag}",
           Command: ["/usr/local/bin/Entrypoint.sh"]
           Essential: True
           PortMappings:
