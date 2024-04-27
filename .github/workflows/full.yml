@@ -76,7 +76,10 @@ jobs:
         template: ./server/cloudformation/infra.yml
         capabilities: CAPABILITY_NAMED_IAM
         parameter-overrides: "DbUser=${{ secrets.DBUSER }},DbPassword=${{ secrets.DBPASSWORD }}"
+        debug: true
 
-    
+     - name: Delete CloudFormation stack on failure
+        if: ${{ steps.deploy.outcome == 'failure' }}
+        run: aws cloudformation delete-stack --stack-name Laravel-Example --region us-east-1
 
 
