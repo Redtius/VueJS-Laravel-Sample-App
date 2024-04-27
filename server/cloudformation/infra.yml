@@ -249,8 +249,8 @@ Resources:
     Properties:
       DBSubnetGroupDescription: "Subnet group for RDS"
       SubnetIds:
-        - !Ref "PrivateSubnetOne"
-        - !Ref "PrivateSubnetTwo"
+        - !Ref "PublicSubnetOne"
+        - !Ref "PublicSubnetTwo"
 
     ############################################################
   #              RDS Database
