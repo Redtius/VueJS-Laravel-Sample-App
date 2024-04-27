@@ -47,6 +47,10 @@ Parameters:
     Description: "IP range for the public subnet in the second Availability Zone"
     Type: "String"
     Default: "10.0.3.0/24"
+  PrivateSubnetTwoCIDR:
+    Description: "IP range for the second private subnet of the database"
+    Type: "String"
+    Default: "10.0.4.0/24"
 
 Resources:
   ############################################################
@@ -95,6 +99,16 @@ Resources:
       Tags:
         - Key: "Name"
           Value: !Sub "${PrivateSubnetOneCIDR}-PrivateSubnetOne"
+  PrivateSubnetTwo:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref RestVPC
+      CidrBlock: !Ref "PrivateSubnetTwoCIDR"
+      AvailabilityZone: !Select ["1", !GetAZs ]
+      MapPublicIpOnLaunch: "False"
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${PrivateSubnetTwoCIDR}-PrivateSubnetTwo"
 
   ######## Create Public Route Table #######
   PublicRouteTable:
@@ -121,6 +135,14 @@ Resources:
       Tags:
         - Key: "Name"
           Value: "PrivateRoute1"
+
+  PrivateRouteTable2:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref RestVPC
+      Tags:
+        - Key: "Name"
+          Value: "PrivateRoute2"
 
   ######## Create Internet Gateway #######
   InternetGateway:
@@ -173,6 +195,11 @@ Resources:
     Properties:
       SubnetId: !Ref "PrivateSubnetOne"
       RouteTableId: !Ref "PrivateRouteTable1"
+  PrivateSubnetTwoRouteTableAssociation:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId: !Ref "PrivateSubnetTwo"
+      RouteTableId: !Ref "PrivateRouteTable2"
 
   ######## Create Custom Network ACL for Public Subnet #######
   PublicNetworkACL:
@@ -223,6 +250,7 @@ Resources:
       DBSubnetGroupDescription: "Subnet group for RDS"
       SubnetIds:
         - !Ref "PrivateSubnetOne"
+        - !Ref "PrivateSubnetTwo"
 
     ############################################################
   #              RDS Database
