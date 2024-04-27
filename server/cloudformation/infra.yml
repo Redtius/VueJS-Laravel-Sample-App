@@ -408,7 +408,7 @@ Resources:
       LoadBalancerAttributes:
         - Key: idle_timeout.timeout_seconds
           Value: 60
-      Name: !Join ["-", [!Ref ServiceName, ApplicationLoadBalancer]]
+      Name: !Join ["-", [!Ref ServiceName, ALB]]
       Scheme: internet-facing
       SecurityGroups:
         - !Ref LoadBalancerSecurityGroup
