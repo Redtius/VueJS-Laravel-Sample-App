@@ -352,7 +352,7 @@ Resources:
       Volumes:
         - Name: laravel-volume
           Host:
-          SourcePath: /var/www/html
+            SourcePath: /var/www/html
 
   ############################################################
   #              IAM ROLE
