@@ -197,8 +197,8 @@ Resources:
       EnablePerformanceInsights: true
       Engine: postgres
       EngineVersion: '14.2'
-      MasterUsername: !Ref DbUser # Use SSM for a better security!!
-      MasterUserPassword: !Ref DbPassword # Use SSM for a better security!!
+      MasterUsername: !Ref DbUser
+      MasterUserPassword: !Ref DbPassword
       PerformanceInsightsRetentionPeriod: 7
       Port: '5432'
       PreferredBackupWindow: 02:00-03:59
@@ -248,6 +248,12 @@ Resources:
                 !Sub "redtius/laravel-example:${ImageTag}",
               ],
             ]
+          Command: ["/usr/local/bin/Entrypoint.sh"]
+          Essential: True
+          MountPoints:
+            - SourceVolume: laravel-volume
+              ContainerPath: /var/www/html
+              ReadOnly: false
           PortMappings:
             - ContainerPort: !Ref ContainerPort
           # Send logs to CloudWatch Logs
@@ -263,13 +269,17 @@ Resources:
             - Name: DB_HOST
               Value: !GetAtt PostgresRDS.Endpoint.Address
             - Name: DB_PORT
-              Value: "5432"
+              Value: '5432'
             - Name: DB_DATABASE
               Value: wordb
             - Name: DB_USERNAME
               Value: !Ref DbUser
             - Name: DB_PASSWORD
               Value: !Ref DbPassword
+          Volumes:
+            - Name: laravel-volume
+              Host:
+                SourcePath: /var/www/html
 
   ############################################################
   #              IAM ROLE
@@ -340,7 +350,6 @@ Resources:
   ############################################################
   Service:
     Type: AWS::ECS::Service
-    # This dependency is needed so that the load balancer is setup correctly in time
     DependsOn:
       - ApplicationLoadBalancer
       - ALBHTTPListener
