@@ -323,10 +323,6 @@ Resources:
             ]
           Command: ["/usr/local/bin/Entrypoint.sh"]
           Essential: True
-          MountPoints:
-            - SourceVolume: laravel-volume
-              ContainerPath: /var/www/html
-              ReadOnly: false
           PortMappings:
             - ContainerPort: !Ref ContainerPort
           # Send logs to CloudWatch Logs
@@ -349,10 +345,6 @@ Resources:
               Value: !Ref DbUser
             - Name: DB_PASSWORD
               Value: !Ref DbPassword
-      Volumes:
-        - Name: laravel-volume
-          Host:
-            SourcePath: /var/www/html
 
   ############################################################
   #              IAM ROLE
