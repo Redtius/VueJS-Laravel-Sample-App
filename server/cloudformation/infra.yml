@@ -349,10 +349,10 @@ Resources:
               Value: !Ref DbUser
             - Name: DB_PASSWORD
               Value: !Ref DbPassword
-          Volumes:
-            - Name: laravel-volume
-              Host:
-                SourcePath: /var/www/html
+      Volumes:
+        - Name: laravel-volume
+          Host:
+          SourcePath: /var/www/html
 
   ############################################################
   #              IAM ROLE
