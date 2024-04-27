@@ -80,6 +80,6 @@ jobs:
 
     - name: Delete CloudFormation stack on failure
       if: ${{ steps.deploy.outcome == 'failure' }}
-      run: aws cloudformation delete-stack --stack-name Laravel-Example --region us-east-1
+      run: aws cloudformation delete-stack --stack-name Laravel-Example1 --region us-east-1
 
 
