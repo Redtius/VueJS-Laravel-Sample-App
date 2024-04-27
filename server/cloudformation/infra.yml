@@ -43,6 +43,10 @@ Parameters:
     Description: "IP range for the private subnet of the database"
     Type: "String"
     Default: "10.0.2.0/24"
+  PublicSubnetTwoCIDR:
+    Description: "IP range for the public subnet in the second Availability Zone"
+    Type: "String"
+    Default: "10.0.3.0/24"
 
 Resources:
   ############################################################
@@ -69,6 +73,17 @@ Resources:
         - Key: "Name"
           Value: !Sub "${PublicSubnetOneCIDR}-PublicSubnetOne"
 
+  PublicSubnetTwo:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref RestVPC
+      CidrBlock: !Ref "PublicSubnetTwoCIDR"
+      AvailabilityZone: !Select ["1", !GetAZs ]
+      MapPublicIpOnLaunch: "True"
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${PublicSubnetTwoCIDR}-PublicSubnetTwo"
+
   ####### Create Private Subnet #######
   PrivateSubnetOne:
     Type: "AWS::EC2::Subnet"
@@ -89,6 +104,14 @@ Resources:
       Tags:
         - Key: "Name"
           Value: "PublicRoute1"
+
+  PublicRouteTableTwo:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref RestVPC
+      Tags:
+        - Key: "Name"
+          Value: "PublicRoute2"
 
   ######## Create Private Route Table #######
   PrivateRouteTable1:
@@ -123,12 +146,26 @@ Resources:
       DestinationCidrBlock: "0.0.0.0/0"
       GatewayId: !Ref "InternetGateway"
 
+  PublicRouteIGW2:
+    Type: "AWS::EC2::Route"
+    DependsOn: "GatewayToInternet"
+    Properties:
+      RouteTableId: !Ref "PublicRouteTableTwo"
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref "InternetGateway"
+
   ######## Associate Public Route Table with Public Subnet1 & Subnet2 #######
   PublicSubnetOneRouteTableAssociation:
     Type: "AWS::EC2::SubnetRouteTableAssociation"
     Properties:
       SubnetId: !Ref "PublicSubnetOne"
       RouteTableId: !Ref "PublicRouteTable"
+
+  PublicSubnetTwoRouteTableAssociation:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId: !Ref "PublicSubnetTwo"
+      RouteTableId: !Ref "PublicRouteTableTwo"
 
   ######## Associate Private Route Table with Private Subnet1 & Subnet2 #######
   PrivateSubnetOneRouteTableAssociation:
@@ -171,6 +208,12 @@ Resources:
     Type: "AWS::EC2::SubnetNetworkAclAssociation"
     Properties:
       SubnetId: !Ref "PublicSubnetOne"
+      NetworkAclId: !Ref "PublicNetworkACL"
+
+  PublicSubnetTwoNetworkAclAssociation:
+    Type: "AWS::EC2::SubnetNetworkAclAssociation"
+    Properties:
+      SubnetId: !Ref "PublicSubnetTwo"
       NetworkAclId: !Ref "PublicNetworkACL"
 
   ######## RDS Subnet Group #######
@@ -370,6 +413,7 @@ Resources:
           AssignPublicIp: ENABLED
           Subnets:
             - !Ref PublicSubnetOne
+            - !Ref PublicSubnetTwo
           SecurityGroups:
             - !Ref ContainerSecurityGroup
       LoadBalancers:
@@ -414,6 +458,7 @@ Resources:
         - !Ref LoadBalancerSecurityGroup
       Subnets:
         - !Ref PublicSubnetOne
+        - !Ref PublicSubnetTwo
 
   ALBHTTPListener:
     Type: "AWS::ElasticLoadBalancingV2::Listener"
