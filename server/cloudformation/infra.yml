@@ -157,6 +157,8 @@ Resources:
     Type: "AWS::EC2::VPCGatewayAttachment"
     Properties:
       VpcId: !Ref RestVPC
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
       InternetGatewayId: !Ref "InternetGateway"
 
   ######## Route-out Public Route Table to Internet Gateway (Internet connection)  #######
